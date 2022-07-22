@@ -1,8 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Router;
 
 use App\Enums\RequestType;
+use App\Exceptions\InvalidRouteFoundException;
+use App\Exceptions\RouteNotFoundException;
 
 class Router
 {
@@ -88,7 +92,34 @@ class Router
   }
 
 
+  /**
+   * @param RequestType $method
+   * @param string $uri
+   * @return string
+   * @throws InvalidRouteFoundException
+   * @throws RouteNotFoundException
+   */
   public function resolve(RequestType $method, string $uri): string
   {
+    $action = $this->routes[$method->value][$uri] ?? null;
+
+    if (!$action) {
+      throw new RouteNotFoundException();
+    }
+
+    if (is_callable($action)) {
+      return $action();
+    }
+
+    [$class, $method] = $action;
+
+    if (class_exists($class)) {
+      $class = new $class;
+      if (method_exists($class, $method)) {
+        return call_user_func_array($method, []);
+      }
+    }
+
+    throw new InvalidRouteFoundException();
   }
 }
