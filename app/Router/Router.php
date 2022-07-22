@@ -15,7 +15,7 @@ class Router
    *
    * @var array
    */
-  public array $routes;
+  public array $routes = [];
 
   /**
    * Registers a new route
@@ -93,15 +93,15 @@ class Router
 
 
   /**
-   * @param RequestType $method
+   * @param RequestType $requestMethod
    * @param string $uri
    * @return string
    * @throws InvalidRouteFoundException
    * @throws RouteNotFoundException
    */
-  public function resolve(RequestType $method, string $uri): string
+  public function resolve(RequestType $requestMethod, string $uri): string
   {
-    $action = $this->routes[$method->value][$uri] ?? null;
+    $action = $this->routes[$requestMethod->value][$uri] ?? null;
 
     if (!$action) {
       throw new RouteNotFoundException();
