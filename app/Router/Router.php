@@ -27,7 +27,27 @@ class Router
    */
   public function register(RequestType $method, string $uri, array|callable $action): self
   {
-    $this->routes[$method->value][$uri] = $action;
+    $params = [];
+
+    preg_match_all('/(?<={).+?(?=})/', $uri, $matches);
+    $matches = [...$matches[0]];
+
+    $routeUriArr = explode('/',
+      preg_replace("/(^\/)|(\/$)/",'', $uri)
+    );
+
+    foreach ($routeUriArr as $k => $v) {
+      $v = str_replace(['{', '}'], '', $v);
+      if (in_array($v, $matches)) {
+        $params[$k] = $v;
+      }
+    }
+
+    $this->routes[$method->value][$uri] = [
+      'action' => $action,
+      'params' => $params
+    ];
+
     return $this;
   }
 
@@ -101,11 +121,42 @@ class Router
    */
   public function resolve(RequestType $requestMethod, string $uri): string
   {
-    $action = $this->routes[$requestMethod->value][$uri] ?? null;
+    $route = $this->routes[$requestMethod->value][$uri] ?? null;
 
-    if (!$action) {
+    if (!$route) {
+      foreach ($this->routes[$requestMethod->value] as $k => $v) {
+        if (!empty($v['params'])) {
+          $route = $v;
+          $routeUriArr = explode('/',
+            preg_replace("/(^\/)|(\/$)/",'', $k)
+          );
+          $cleanedRequestUriArr =  explode('/',
+            preg_replace("/(^\/)|(\/$)/",'',$uri)
+          );
+
+          foreach ($routeUriArr as $_k => $_v) {
+            preg_match_all('/(?<={).+?(?=})/', $k, $matches);
+            if (
+              (count($routeUriArr) === count($cleanedRequestUriArr)) &&
+              (in_array($_k, array_keys($v['params'])) || $_v === $cleanedRequestUriArr[$_k])
+            ) {
+              continue;
+            }
+            $route = [];
+            break;
+          }
+          if ($route) {
+            break;
+          }
+        }
+      }
+    }
+
+    if (!$route) {
       throw new RouteNotFoundException();
     }
+
+    ['action' => $action] = $route;
 
     if (is_callable($action)) {
       return $action();
