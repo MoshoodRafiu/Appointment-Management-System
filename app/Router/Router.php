@@ -98,6 +98,8 @@ class Router
 
 
     /**
+     * Resolve a route
+     *
      * @param RequestType $requestMethod
      * @param string $uri
      * @return string
@@ -112,36 +114,7 @@ class Router
         $params = [];
 
         if (!$route) {
-            foreach (
-            ($this->routes[$requestMethod->value] ?? []) as $k => $v) {
-                if (!empty($v['params'])) {
-                    $route                = $v;
-                    $routeUriArr          = explode('/',
-                        preg_replace("/(^\/)|(\/$)/", '', $k)
-                    );
-                    $cleanedRequestUriArr = explode('/',
-                        preg_replace("/(^\/)|(\/$)/", '', $uri)
-                    );
-
-                    foreach ($routeUriArr as $_k => $_v) {
-                        preg_match_all('/(?<={).+?(?=})/', $k, $matches);
-                        if (count($routeUriArr) === count($cleanedRequestUriArr)) {
-                            if ($_v === $cleanedRequestUriArr[$_k]) {
-                                continue;
-                            } elseif (in_array($_k, array_keys($v['params']))) {
-                                $key          = $v['params'][$_k];
-                                $params[$key] = $cleanedRequestUriArr[$_k];
-                                continue;
-                            }
-                        }
-                        $route = [];
-                        break;
-                    }
-                    if ($route) {
-                        break;
-                    }
-                }
-            }
+            $route = $this->getPathParamRoute($requestMethod, $uri);
         }
 
         if (!$route) {
@@ -211,6 +184,49 @@ class Router
         }
 
         return $params;
+    }
+
+    /**
+     * Get path param route
+     *
+     * @param RequestType $method
+     * @param string $uri
+     * @return array
+     */
+    private function getPathParamRoute(RequestType $method, string $uri): array
+    {
+        $routes = $this->routes[$method->value] ?? [];
+        $route  = [];
+        foreach ($routes as $k => $v) {
+            if (!empty($v['params'])) {
+                $route         = $v;
+                $routeUriArr   = explode('/',
+                    preg_replace("/(^\/)|(\/$)/", '', $k)
+                );
+                $requestUriArr = explode('/',
+                    preg_replace("/(^\/)|(\/$)/", '', $uri)
+                );
+
+                foreach ($routeUriArr as $_k => $_v) {
+                    preg_match_all('/(?<={).+?(?=})/', $k, $matches);
+                    if (count($routeUriArr) === count($requestUriArr)) {
+                        if ($_v === $requestUriArr[$_k]) {
+                            continue;
+                        } elseif (in_array($_k, array_keys($v['params']))) {
+                            $key          = $v['params'][$_k];
+                            $params[$key] = $requestUriArr[$_k];
+                            continue;
+                        }
+                    }
+                    $route = [];
+                    break;
+                }
+                if ($route) {
+                    break;
+                }
+            }
+        }
+        return $route;
     }
 
     /**
