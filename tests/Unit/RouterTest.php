@@ -37,7 +37,7 @@ class RouterTest extends TestCase
   {
     $this->router->register($method, $uri, $action);
 
-    $params = $this->router->getParams($uri);
+    $params = $this->router->getPathParams($uri);
     $expected = [
       $method->value => [
         $uri => [
@@ -65,8 +65,6 @@ class RouterTest extends TestCase
   ): void
   {
     $this->router->register($method, $uri, $action);
-
-    $params = $this->router->getParams($uri);
 
     if (is_callable($action)) {
       $expected = call_user_func($action);

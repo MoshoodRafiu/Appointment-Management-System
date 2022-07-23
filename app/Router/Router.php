@@ -7,6 +7,7 @@ namespace App\Router;
 use App\Enums\RequestType;
 use App\Exceptions\InvalidRouteFoundException;
 use App\Exceptions\RouteNotFoundException;
+use App\Helpers\Request;
 
 class Router
 {
@@ -27,13 +28,11 @@ class Router
    */
   public function register(RequestType $method, string $uri, array|callable $action): self
   {
-    $params = $this->getParams($uri);
-
+    $params = $this->getPathParams($uri);
     $this->routes[$method->value][$uri] = [
       'action' => $action,
       'params' => $params
     ];
-
     return $this;
   }
 
@@ -107,6 +106,7 @@ class Router
    */
   public function resolve(RequestType $requestMethod, string $uri): string
   {
+    $uri = explode('?', $uri)[0];
     $route = $this->routes[$requestMethod->value][$uri] ?? null;
 
     if (!$route) {
@@ -146,8 +146,10 @@ class Router
 
     ['action' => $action] = $route;
 
+    $request = new Request($_REQUEST);
+
     if (is_callable($action)) {
-      return call_user_func($action);
+      return call_user_func($action, $request);
     }
 
     [$class, $method] = $action;
@@ -178,7 +180,7 @@ class Router
    * @param string $uri
    * @return array
    */
-  public function getParams(string $uri): array
+  public function getPathParams(string $uri): array
   {
     $params = [];
 

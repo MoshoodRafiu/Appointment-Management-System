@@ -1,10 +1,11 @@
-<?php
+<?php /** @noinspection PhpUndefinedFieldInspection */
 
+use App\Helpers\Request;
 use App\Router\Router;
 
 $router = new Router();
 
-$router->get('/', function () {
+$router->get('/', function (Request $request) {
   return "Hello World";
 });
 
