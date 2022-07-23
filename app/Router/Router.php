@@ -131,7 +131,7 @@ class Router
             if (!$this->expectsRequestParam(new \ReflectionFunction($action))) {
                 unset($params['request']);
             }
-            return call_user_func_array($action, $params);
+            return (string) call_user_func_array($action, $params);
         }
 
         [$class, $method] = $action;
@@ -142,7 +142,7 @@ class Router
                 if (!$this->expectsRequestParam(new \ReflectionMethod($class, $method))) {
                     unset($params['request']);
                 }
-                return call_user_func_array([new $class, $method], $params);
+                return (string) call_user_func_array([new $class, $method], $params);
             }
         }
 
