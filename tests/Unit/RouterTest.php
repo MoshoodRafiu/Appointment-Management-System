@@ -20,8 +20,9 @@ class RouterTest extends TestCase
   }
 
   /**
-   * @test
+   * Test that routes are resolved
    *
+   * @test
    * @param RequestType $method
    * @param string $uri
    * @param callable|array $action
@@ -30,7 +31,8 @@ class RouterTest extends TestCase
    */
   public function it_registers_routes(
     RequestType $method, string $uri, callable|array $action
-  ){
+  ): void
+  {
     $this->router->register($method, $uri, $action);
 
     $params = $this->router->getParams($uri);
@@ -44,5 +46,33 @@ class RouterTest extends TestCase
     ];
 
     $this->assertEquals($expected, $this->router->getRoutes());
+  }
+
+  /**
+   * Test that routes are resolved
+   *
+   * @test
+   * @param RequestType $method
+   * @param string $uri
+   * @param callable|array $action
+   * @dataProvider Tests\DataProviders\RouteDataProvider::routeResolveCases
+   * @return void
+   */
+  public function it_resolves_routes(
+    RequestType $method, string $uri, callable|array $action
+  ): void
+  {
+    $this->router->register($method, $uri, $action);
+
+    $params = $this->router->getParams($uri);
+
+    if (is_callable($action)) {
+      $expected = call_user_func($action);
+    } else {
+      [$class, $methodName] = $action;
+      $expected = call_user_func_array([new $class, $methodName], []);
+    }
+
+    $this->assertEquals($expected, $this->router->resolve($method, $uri));
   }
 }

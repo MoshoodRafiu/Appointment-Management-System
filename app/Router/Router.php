@@ -145,7 +145,7 @@ class Router
     ['action' => $action] = $route;
 
     if (is_callable($action)) {
-      return $action();
+      return call_user_func($action);
     }
 
     [$class, $method] = $action;
@@ -153,7 +153,7 @@ class Router
     if (class_exists($class)) {
       $class = new $class;
       if (method_exists($class, $method)) {
-        return call_user_func_array($method, []);
+        return call_user_func_array([new $class, $method], []);
       }
     }
 
