@@ -15,7 +15,7 @@ class Router
    *
    * @var array
    */
-  public array $routes = [];
+  private array $routes = [];
 
   /**
    * Registers a new route
@@ -27,21 +27,7 @@ class Router
    */
   public function register(RequestType $method, string $uri, array|callable $action): self
   {
-    $params = [];
-
-    preg_match_all('/(?<={).+?(?=})/', $uri, $matches);
-    $matches = [...$matches[0]];
-
-    $routeUriArr = explode('/',
-      preg_replace("/(^\/)|(\/$)/",'', $uri)
-    );
-
-    foreach ($routeUriArr as $k => $v) {
-      $v = str_replace(['{', '}'], '', $v);
-      if (in_array($v, $matches)) {
-        $params[$k] = $v;
-      }
-    }
+    $params = $this->getParams($uri);
 
     $this->routes[$method->value][$uri] = [
       'action' => $action,
@@ -172,5 +158,42 @@ class Router
     }
 
     throw new InvalidRouteFoundException();
+  }
+
+  /**
+   * Get all registered routes
+   *
+   * @return array
+   */
+  public function getRoutes(): array
+  {
+    return $this->routes;
+  }
+
+  /**
+   * Gets the parameters in uri
+   *
+   * @param string $uri
+   * @return array
+   */
+  public function getParams(string $uri): array
+  {
+    $params = [];
+
+    preg_match_all('/(?<={).+?(?=})/', $uri, $matches);
+    $matches = [...$matches[0]];
+
+    $routeUriArr = explode('/',
+      preg_replace("/(^\/)|(\/$)/",'', $uri)
+    );
+
+    foreach ($routeUriArr as $k => $v) {
+      $v = str_replace(['{', '}'], '', $v);
+      if (in_array($v, $matches)) {
+        $params[$k] = $v;
+      }
+    }
+
+    return $params;
   }
 }
