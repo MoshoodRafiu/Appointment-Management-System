@@ -110,7 +110,9 @@ class Router
     $route = $this->routes[$requestMethod->value][$uri] ?? null;
 
     if (!$route) {
-      foreach ($this->routes[$requestMethod->value] as $k => $v) {
+      foreach (
+        ($this->routes[$requestMethod->value] ?? []) as $k => $v
+      ) {
         if (!empty($v['params'])) {
           $route = $v;
           $routeUriArr = explode('/',
