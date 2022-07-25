@@ -105,4 +105,15 @@ class RouterTest extends TestCase
         $this->expectException(InvalidRouteFoundException::class);
         $this->router->resolve(RequestType::GET, '/invalid');
     }
+
+    /**
+     * @test
+     * @return void
+     */
+    public function it_gets_path_params(): void
+    {
+        $uri = '/{name}/{id}';
+        $expected = ['name', 'id'];
+        $this->assertEquals($expected, $this->router->getPathParams($uri));
+    }
 }
