@@ -1,4 +1,4 @@
-<?php /** @noinspection PhpUndefinedFieldInspection */
+<?php
 
 use App\Controllers\AuthController;
 use App\Router\Router;

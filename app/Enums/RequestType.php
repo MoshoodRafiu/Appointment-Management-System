@@ -16,7 +16,7 @@ enum RequestType: string
      * @param string $name
      * @return static
      */
-    public static function getType(string $name): self
+    public static function get(string $name): self
     {
         $name = strtolower($name);
         return match ($name) {

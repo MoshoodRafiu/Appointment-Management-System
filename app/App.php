@@ -6,6 +6,7 @@ namespace App;
 
 use App\Enums\RequestType;
 use App\Router\Router;
+use Dotenv\Dotenv;
 
 class App
 {
@@ -15,6 +16,8 @@ class App
 
     public function boot(): self
     {
+        $dotenv = Dotenv::createImmutable(dirname(__DIR__));
+        $dotenv->load();
         return $this;
     }
 
@@ -29,7 +32,7 @@ class App
     public function run(): self
     {
         echo $this->router->resolve(
-            RequestType::getType($_SERVER['REQUEST_METHOD']),
+            RequestType::get($_SERVER['REQUEST_METHOD']),
             $_SERVER['REQUEST_URI']
         );
         return $this;

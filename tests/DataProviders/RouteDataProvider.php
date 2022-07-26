@@ -10,6 +10,7 @@ class RouteDataProvider
     public function routeRegisterCases(): array
     {
         return [
+            [RequestType::GET, '/', fn() => "Test"],
             [RequestType::GET, '/test/{user}', fn() => "Test"],
             [RequestType::POST, '/test', fn() => "Test"],
             [RequestType::PUT, '/test/{id}/update', fn() => "Test"],
