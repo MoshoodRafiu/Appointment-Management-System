@@ -26,8 +26,9 @@ class ViewResponseTest extends TestCase
 
     public function tearDown(): void
     {
-        if (file_exists($this->name)) {
-            unlink($this->name);
+        $path = self::VIEW_PATH . $this->name . '.php';
+        if (file_exists($path)) {
+            unlink($path);
         }
     }
 
