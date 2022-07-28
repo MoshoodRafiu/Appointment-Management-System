@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\Container;
 use App\Enums\RequestType;
 use App\Exceptions\InvalidRouteFoundException;
 use App\Exceptions\RouteNotFoundException;
@@ -19,7 +20,15 @@ class RouterTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->router = new Router();
+        $class = new class {
+            public function index(): string
+            {
+                return "Hello";
+            }
+        };
+        $containerMock = $this->createMock(Container::class);
+        $containerMock->method('get')->willReturn($class);
+        $this->router = new Router($containerMock);
     }
 
     /**
