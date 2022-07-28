@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Router;
 
+use App\Container;
+use App\Controllers\AuthController;
 use App\Enums\RequestType;
 use App\Exceptions\InvalidRouteFoundException;
 use App\Exceptions\RouteNotFoundException;
@@ -17,6 +19,10 @@ class Router
      * @var array
      */
     private array $routes = [];
+
+    public function __construct(protected Container $container)
+    {
+    }
 
     /**
      * Registers a new route
@@ -137,7 +143,7 @@ class Router
         [$class, $method] = $action;
 
         if (class_exists($class)) {
-            $class = new $class;
+            $class = $this->container->get($class);
             if (method_exists($class, $method)) {
                 if (!$this->expectsRequestParam(new \ReflectionMethod($class, $method))) {
                     unset($params['request']);

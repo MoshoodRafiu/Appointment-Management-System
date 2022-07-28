@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpPureAttributeCanBeAddedInspection */
 
 declare(strict_types=1);
 
@@ -10,8 +10,11 @@ use Dotenv\Dotenv;
 
 class App
 {
+    public Container $container;
+
     public function __construct(protected Router $router)
     {
+        $this->container = new Container();
     }
 
     public function boot(): self
