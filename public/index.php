@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\App;
-use Dotenv\Dotenv;
+use App\Container;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -15,6 +15,7 @@ if (file_exists($path) && is_file($path)) {
     return false;
 }
 
-(new App($router))
+$container = new Container();
+(new App($container, $router))
     ->boot()
     ->run();

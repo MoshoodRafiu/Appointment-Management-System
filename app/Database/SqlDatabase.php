@@ -12,10 +12,16 @@ class SqlDatabase implements DatabaseInterface
 {
     protected PDO $db;
 
-    public function __construct(protected Config $config){
+    public function __construct(protected Config $config)
+    {
         $dbConfig = $config->db();
         $dsn = "{$dbConfig['driver']}:host={$dbConfig['host']};port={$dbConfig['port']};dbname={$dbConfig['database']}";
-        $this->db = new PDO($dsn, $dbConfig['username'], $dbConfig['password']);
+        $this->db = new PDO(
+            $dsn,
+            $dbConfig['username'],
+            $dbConfig['password'],
+            [PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ]
+        );
     }
 
     public function getInstance(): PDO
