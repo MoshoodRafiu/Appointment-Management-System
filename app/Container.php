@@ -55,6 +55,16 @@ class Container implements ContainerInterface
     }
 
     /**
+     * Gets all entries
+     *
+     * @return array
+     */
+    public function getEntries(): array
+    {
+        return $this->entries;
+    }
+
+    /**
      * Resolves a class
      *
      * @param string $id
