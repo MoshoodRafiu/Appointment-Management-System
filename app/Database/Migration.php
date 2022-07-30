@@ -17,6 +17,11 @@ class Migration
         $this->db = $database->getInstance();
     }
 
+    /**
+     * Creates the migrations table
+     *
+     * @return $this
+     */
     public function init(): self
     {
         $this->db->query(
@@ -28,6 +33,14 @@ class Migration
         return $this;
     }
 
+    /**
+     * Register a migration
+     *
+     * @param string $name
+     * @param string $query
+     * @return $this
+     * @throws MigrationException
+     */
     public function register(string $name, string $query): self
     {
         if (isset($this->entries[$name])) {
@@ -37,19 +50,36 @@ class Migration
         return $this;
     }
 
+    /**
+     * Runs the registered migrations
+     *
+     * @return $this
+     */
     public function run(): self
     {
         $migrated = $this->getMigratedEntries();
-        $entries  = array_filter($this->entries, fn($v) => !in_array($v, $migrated));
+
+        $entries  = array_filter(
+            $this->entries,
+            fn($v) => !in_array($v, $migrated),
+            ARRAY_FILTER_USE_KEY
+        );
 
         foreach ($entries as $entry) {
             $this->db->query($entry);
         }
 
-        $this->setMigratedEntries(array_keys($entries));
+        if ($entries) {
+            $this->setMigratedEntries(array_keys($entries));
+        }
 
         echo "Migration ran successfully";
         return $this;
+    }
+
+    public function getEntries(): array
+    {
+        return $this->entries;
     }
 
     protected function getMigratedEntries(): bool|array
