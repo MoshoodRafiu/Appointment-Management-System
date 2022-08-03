@@ -19,13 +19,13 @@ class MigrationTest extends TestCase
     protected function setUp(): void
     {
         $this->initDb();
-        $this->migration = new Migration($this->database);
+        $this->migration = new Migration($this->database, new Config());
         $this->migration->init();
     }
 
     protected function tearDown(): void
     {
-        $this->refreshDatabase();
+        $this->migration->fresh();
     }
 
     /**

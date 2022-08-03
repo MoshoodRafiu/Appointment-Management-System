@@ -2,6 +2,7 @@
 
 namespace App\Database;
 
+use App\Config\Config;
 use App\Exceptions\MigrationException;
 use App\Interfaces\DatabaseInterface;
 use PDO;
@@ -12,7 +13,7 @@ class Migration
     protected array $entries = [];
     protected PDO   $db;
 
-    public function __construct(DatabaseInterface $database)
+    public function __construct(DatabaseInterface $database, protected Config $config)
     {
         $this->db = $database->getInstance();
     }
@@ -30,6 +31,28 @@ class Migration
                 created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
             )"
         );
+        return $this;
+    }
+
+    /**
+     * Refreshes the database
+     *
+     * @param bool $constrained
+     * @return $this
+     */
+    public function fresh(?bool $constrained = false): self
+    {
+        $tables = $this->db->query("SHOW TABLES")->fetchAll();
+        if (!$constrained) {
+            $this->db->query("SET FOREIGN_KEY_CHECKS=0");
+        }
+        foreach ($tables as $table) {
+            $this->db
+                 ->query(
+                     "DROP TABLES {$table->{'Tables_in_' . $this->config->db()['database']}}
+                 ")
+                 ->fetchAll();
+        }
         return $this;
     }
 

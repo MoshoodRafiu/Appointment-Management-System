@@ -21,5 +21,6 @@ $migration->register("createUserTable", "
 ");
 
 $migration
+    ->fresh()
     ->init()
     ->run();
