@@ -28,7 +28,7 @@ class Migration
             "CREATE TABLE IF NOT EXISTS " . $this::TABLE . "(
                 name TEXT NOT NULL,
                 created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-            );"
+            )"
         );
         return $this;
     }
@@ -72,8 +72,6 @@ class Migration
         if ($entries) {
             $this->setMigratedEntries(array_keys($entries));
         }
-
-        echo "Migration ran successfully";
         return $this;
     }
 
@@ -82,7 +80,7 @@ class Migration
         return $this->entries;
     }
 
-    protected function getMigratedEntries(): bool|array
+    public function getMigratedEntries(): bool|array
     {
         $query = 'SELECT name FROM ' . $this::TABLE;
         return array_map(
@@ -95,10 +93,9 @@ class Migration
     {
         $query = 'INSERT INTO ' . $this::TABLE . ' (name) VALUES';
         foreach ($entries as $entry) {
-            $query .= ' ("' . $entry . '")' . ($entry !== end($entries) ? ',' : ';');
-
+            $query .= ' ("' . $entry . '")' . ($entry !== end($entries) ? ',' : '');
         }
-        var_dump($query);
+
         return array_map(
             fn($v) => $v->query,
             $this->db->query($query)->fetchAll()
