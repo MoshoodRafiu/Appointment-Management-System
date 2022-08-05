@@ -47,7 +47,7 @@ $migration->register("createEventTable", "
         name VARCHAR(255) NOT NULL,
         description TEXT NOT NULL,
         {$timestamps},
-        FOREIGN KEY (business_id) REFERENCES customers(id) ON DELETE CASCADE
+        FOREIGN KEY (business_id) REFERENCES businesses(id) ON DELETE CASCADE
     );
 ");
 
