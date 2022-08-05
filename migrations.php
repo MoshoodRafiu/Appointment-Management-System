@@ -14,6 +14,10 @@ $container = new Container();
 $migration = $container->get(Migration::class);
 
 $primaryKeySql = 'id INT UNSIGNED PRIMARY KEY UNIQUE NOT NULL AUTO_INCREMENT';
+$timestamps = '
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+';
 
 $migration->register("createCustomerTable", "
     CREATE TABLE IF NOT EXISTS customers (
@@ -21,7 +25,8 @@ $migration->register("createCustomerTable", "
         name VARCHAR(255) NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
         gender ENUM('male', 'female') NOT NULL,
-        password VARCHAR(255) NOT NULL
+        password VARCHAR(255) NOT NULL,
+        {$timestamps}
     );
 ");
 
@@ -30,7 +35,8 @@ $migration->register("createBusinessTable", "
         {$primaryKeySql},
         name VARCHAR(255),
         email VARCHAR(255) UNIQUE NOT NULL,
-        address TEXT
+        address TEXT,
+        {$timestamps}
     );
 ");
 
@@ -40,6 +46,7 @@ $migration->register("createEventTable", "
         business_id INT UNSIGNED NOT NULL,
         name VARCHAR(255) NOT NULL,
         description TEXT NOT NULL,
+        {$timestamps},
         FOREIGN KEY (business_id) REFERENCES customers(id) ON DELETE CASCADE
     );
 ");
@@ -51,6 +58,7 @@ $migration->register("createAppointmentsTable", "
         customer_id INT UNSIGNED NOT NULL,
         name VARCHAR(255) NOT NULL,
         date DATETIME,
+        {$timestamps},
         FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
         FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE
     );
