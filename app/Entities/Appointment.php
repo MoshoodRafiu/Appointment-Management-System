@@ -8,13 +8,7 @@ use DateTime;
 
 class Appointment extends Entity
 {
-    public function __construct(
-        public ?int $id = null,
-        public ?int $event_id = null,
-        public ?int $customer_id = null,
-        public ?string $name = null,
-        public ?DateTime $date = null
-    ) {
-        parent::__construct();
-    }
+    protected array $fields = [
+        'event_id', 'customer_id', 'name', 'date'
+    ];
 }
