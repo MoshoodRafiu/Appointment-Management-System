@@ -15,6 +15,14 @@ interface RepositoryInterface
     public function getAll(?array $conditions = []): array;
 
     /**
+     * Retrieves the first data by conditions
+     *
+     * @param array|null $conditions
+     * @return object
+     */
+    public function getFirst(?array $conditions = []): ?object;
+
+    /**
      * Retrieves data by id
      *
      * @param integer $id
@@ -23,23 +31,7 @@ interface RepositoryInterface
     public function getById(int $id): object;
 
     /**
-     * Retrieves the first data by conditions
-     *
-     * @param array|null $conditions
-     * @return object
-     */
-    public function getFirst(?array $conditions = []): object;
-
-    /**
-     * Retrieves the last data by conditions
-     *
-     * @param array|null $conditions
-     * @return object
-     */
-    public function getLast(?array $condition = []): object;
-
-    /**
-     * Persists data in storage
+     * Persists data to storage
      *
      * @param Entity $entity
      * @return object
