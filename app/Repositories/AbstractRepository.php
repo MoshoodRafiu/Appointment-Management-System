@@ -7,10 +7,12 @@ namespace App\Repositories;
 use App\Database\SqlDatabase;
 use App\Entities\Entity;
 use App\Interfaces\RepositoryInterface;
+use PDO;
 
 class AbstractRepository implements RepositoryInterface
 {
     public string $tableName;
+    public string $entity;
     public \PDO   $db;
 
     public function __construct(public SqlDatabase $sqlDatabase)
@@ -23,15 +25,15 @@ class AbstractRepository implements RepositoryInterface
         $query = $this->buildSelectQuery($conditions);
         $stmt = $this->db->prepare($query);
         $stmt->execute(array_values($conditions));
-        return $stmt->fetch();
+        return $stmt->fetch(PDO::FETCH_CLASS, $this->entity);
     }
 
-    public function getFirst(?array $conditions = []): ?object
+    public function getFirst(?array $conditions = []): ?Entity
     {
         return $this->getAll($conditions)[0] ?? null;
     }
 
-    public function getById(int $id): object
+    public function getById(int $id): Entity
     {
         return $this->getFirst(compact('id'));
     }

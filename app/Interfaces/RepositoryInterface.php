@@ -18,23 +18,23 @@ interface RepositoryInterface
      * Retrieves the first data by conditions
      *
      * @param array|null $conditions
-     * @return object
+     * @return Entity|null
      */
-    public function getFirst(?array $conditions = []): ?object;
+    public function getFirst(?array $conditions = []): ?Entity;
 
     /**
      * Retrieves data by id
      *
      * @param integer $id
-     * @return object
+     * @return Entity|null
      */
-    public function getById(int $id): object;
+    public function getById(int $id): ?Entity;
 
     /**
      * Persists data to storage
      *
      * @param Entity $entity
-     * @return object
+     * @return bool
      */
     public function save(Entity $entity): bool;
 }

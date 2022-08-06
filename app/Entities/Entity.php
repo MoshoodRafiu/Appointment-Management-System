@@ -7,10 +7,6 @@ use DateTime;
 
 abstract class Entity
 {
-    /**
-     * @var array
-     */
-    public array $attributes = [];
 
     /**
      * @var array
@@ -18,39 +14,41 @@ abstract class Entity
     protected array $fields = [];
 
     /**
+     * @var string
+     */
+    protected string $primaryKey = 'id';
+
+    /**
      * @var bool
      */
     protected bool $withTimestamps = true;
 
+    /**
+     * @var array|string[]
+     */
     protected array $timeStampFields = ['created_at', 'updated_at'];
 
     /**
-     * @param string $name
-     * @param $value
-     * @throws EntityException
+     * @return array
      */
-    public function __set(string $name, $value): void
+    public function getAttributes(): array
     {
-        if (!in_array($name, $this->fields)) {
-            throw new EntityException("The specified field wasn't found");
+        $attributes = [];
+
+        foreach ($this->fields as $field) {
+            $attributes[$field] = $this->{$field};
         }
-        $this->attributes[$name] = $value;
+
+        if ($this->{$this->primaryKey}) {
+            $attributes[$this->primaryKey] = $this->{$this->primaryKey};
+        }
+
+        return array_merge($attributes, $this->getTimestamps());
     }
 
     /**
-     * @param string $name
-     * @return string|null
+     * @return array
      */
-    public function __get(string $name): ?string
-    {
-        return $this->attributes[$name] ?? null;
-    }
-
-    public function getAttributes(): array
-    {
-        return array_merge($this->attributes, $this->getTimestamps());
-    }
-
     public function getTimestamps(): array
     {
         if (!$this->withTimestamps) {
