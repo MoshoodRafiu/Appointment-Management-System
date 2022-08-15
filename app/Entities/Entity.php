@@ -16,7 +16,7 @@ abstract class Entity
     /**
      * @var string
      */
-    protected string $primaryKey = 'id';
+    public string $primaryKey = 'id';
 
     /**
      * @var bool
@@ -59,5 +59,10 @@ abstract class Entity
             $timestamps[$field] = new DateTime();
         }
         return $timestamps;
+    }
+
+    public function __get(string $name)
+    {
+        return $this->getAttributes()[$name] ?? null;
     }
 }

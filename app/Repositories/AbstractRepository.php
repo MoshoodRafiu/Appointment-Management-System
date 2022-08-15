@@ -25,7 +25,7 @@ class AbstractRepository implements RepositoryInterface
         $query = $this->buildSelectQuery($conditions);
         $stmt = $this->db->prepare($query);
         $stmt->execute(array_values($conditions));
-        return $stmt->fetch(PDO::FETCH_CLASS, $this->entity);
+        return $stmt->fetchAll(PDO::FETCH_CLASS, $this->entity);
     }
 
     public function getFirst(?array $conditions = []): ?Entity
@@ -40,7 +40,16 @@ class AbstractRepository implements RepositoryInterface
 
     public function save(Entity $entity): bool
     {
-        // TODO: Implement save() method.
+        $primaryKey = $entity->{$entity->primaryKey};
+        $attributes = $entity->getAttributes();
+        $columns = array_keys($attributes);
+        if (!$primaryKey) {
+            $query = $this->buildInsertQuery($columns);
+        } else {
+            $query = $this->buildUpdateQuery($entity, $columns, $primaryKey);
+        }
+        $stmt = $this->db->prepare($query);
+        return $stmt->execute(array_values($attributes));
     }
 
     protected function buildSelectQuery($conditions): string
@@ -49,9 +58,29 @@ class AbstractRepository implements RepositoryInterface
         if (!empty($conditions)) {
             $query .= " WHERE ";
             foreach ($conditions as $field => $value) {
-                $query .= "{$field} = ?";
+                $query .= "{$field} = ? " . ($value !== end($conditions) ? 'AND' : ';');
             }
         }
+        return $query;
+    }
+
+    protected function buildInsertQuery(array $columns): string
+    {
+        $query = "INSERT INTO {$this->tableName} (" . implode(" ,", $columns) . ") VALUES (";
+        foreach ($columns as $column) {
+            $query .= '?' . ($column !== end($columns) ? ',' : '');
+        }
+        $query .= ")";
+        return $query;
+    }
+
+    protected function buildUpdateQuery(Entity $entity, array $columns, string $primaryKey): string
+    {
+        $query = "UPDATE {$this->tableName} SET ";
+        foreach ($columns as $column) {
+            $query .= "{$column} = ? " . ($column !== end($columns) ? ',' : '');
+        }
+        $query .= "WHERE {$entity->primaryKey} = {$primaryKey}";
         return $query;
     }
 }
